@@ -28,18 +28,31 @@ Dans ce cas, ajouter une nouvelle entrée qui remplace l'ancienne, sans effacer 
 | D13 | Classification commune des erreurs : concept, méthode, calcul, inattention. Utilisée par le mode `corrige` et par le suivi des erreurs. | C3 : 04 / 03 Étape 5 / 02 §6 |
 | D14 | Le dossier StudyHub AI a son propre dépôt Git, séparé du dépôt du dossier personnel. Dépôt distant : https://github.com/Med-EL-GHAZOUI/StudyHub-AI | Audit Git |
 
+### Choix techniques du MVP (validés le 2026-10-24)
+| ID | Décision | Remplace |
+|---|---|---|
+| D15 | Stack : Python (3.11, installé sur le poste) + Streamlit pour l'interface. | H1 |
+| D16 | Fournisseur de LLM : Anthropic (Claude). Le modèle précis est choisi en phase 2. La clé d'API est lue depuis `.env`. | H2 |
+| D17 | Un seul utilisateur, sans authentification. | H3 |
+
+### Choix techniques de la phase 1 (validés le 2026-10-24)
+| ID | Décision | Remplace |
+|---|---|---|
+| D18 | Formats acceptés en phase 1 : PDF, `.txt` et `.md`. PPTX et DOCX à la fin du MVP. | H9 |
+| D19 | Extraction PDF avec `pypdf`. | H10 |
+| D20 | Tests avec `pytest` ; les PDF de test sont générés par les tests eux-mêmes (`fpdf2`). | H11 |
+| D21 | Taille maximale d'un fichier importé : 20 Mo. | H12 |
+| D22 | Une page avec moins de 20 caractères extraits est considérée comme vide ou scannée. | H13 |
+| D23 | Structure du code : `app.py` (interface) + paquet `studyhub/` (logique) + `tests/`. | H14 |
+
 ## ❓ Hypothèses à confirmer
 | ID | Question | Recommandation actuelle |
 |---|---|---|
-| H1 | Stack technique | Python + Streamlit pour le MVP |
-| H2 | Fournisseur de LLM | À choisir : OpenAI (cité dans le README) ou Anthropic |
-| H3 | Utilisateurs du MVP | Un seul utilisateur, sans authentification |
 | H4 | Seuil de mise en production | Moyenne ≥ 8/10 et 100 % des tests négatifs réussis |
 | H5 | Section « Sécurité » dans 02 et erreurs techniques dans 02 §4 | Injection de prompt, contrôle des imports, clés d'API, panne et quota du LLM |
 | H6 | PDF scannés | MVP : refuser avec un message clair ; OCR plus tard |
 | H7 | Vérification des URL de références | Contrôle automatique que le lien répond ; la pertinence reste à juger |
 | H8 | Nom « StudyHub AI » dans le README | Ajouter une section consacrée à l'application |
-
 ## ❌ Options rejetées
 | Option | Raison | Date |
 |---|---|---|

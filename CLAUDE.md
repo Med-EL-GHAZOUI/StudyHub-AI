@@ -32,10 +32,12 @@ Une tâche est terminée seulement si :
 Sinon, dire précisément ce qui manque ou échoue. Ne jamais annoncer un succès non vérifié.
 
 ## Commandes
-_À compléter après le choix de la stack (voir `DECISIONS.md`, H1)._
-- Installer : …
-- Lancer : …
-- Tester : …
+Stack : Python 3.11 + Streamlit (D15). Commandes PowerShell, depuis la racine du projet.
+L'environnement virtuel est appelé directement (`.venv\Scripts\python`), sans activation, pour éviter les blocages de la politique d'exécution de PowerShell.
+- Créer l'environnement (une seule fois) : `python -m venv .venv`
+- Installer : `.venv\Scripts\python -m pip install -r requirements.txt -r requirements-dev.txt`
+- Lancer : `.venv\Scripts\python -m streamlit run app.py`
+- Tester : `.venv\Scripts\python -m pytest`
 
 ## Sécurité du développement
 - Les clés d'API et autres secrets vont dans `.env`, jamais dans le code ni dans Git. Fournir un `.env.example` sans valeurs réelles.

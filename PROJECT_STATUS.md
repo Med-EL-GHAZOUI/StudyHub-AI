@@ -2,34 +2,67 @@
 Dernière mise à jour : 2026-10-24
 
 ## Phase actuelle
-**Phase 0 — Fondations** (en cours)
+**Phase 1 — Import et extraction** (en cours)
 
 ## Feuille de route
 | Phase | Contenu | Statut |
 |---|---|---|
-| 0 | Fondations : décisions, fichiers de pilotage, dépôt Git, stack | En cours |
-| 1 | Import et extraction (02 étapes 1 à 3) | À faire |
-| 2 | Génération MVP (02 §6) | À faire |
-| 3 | Harness d'évaluation (05) | À faire ; bloque la phase 4 (D09) |
+| 0 | Fondations : décisions, fichiers de pilotage, dépôt Git, stack | Terminée |
+| 1 | Import et extraction (02 étapes 1 à 3) | En cours |
+| 2 | Génération MVP (02 §6) | À faire ; trancher H5 (sécurité) avant |
+| 3 | Harness d'évaluation (05) | À faire ; trancher H4 (seuil) avant ; bloque la phase 4 (D09) |
 | 4 | Version suivante (02 §6) | À faire |
 
-## Phase 0 : tâches
+## Phase 0 : tâches (terminée)
 - [x] Audit des fichiers README et 01 à 05
 - [x] Arbitrage des contradictions C1, C2, C3 (D11 à D13)
 - [x] Création de CLAUDE.md, DECISIONS.md, PROJECT_STATUS.md
 - [x] Report de D11 à D13 dans 01, 02 et 03
 - [x] Dépôt Git propre au projet + .gitignore (D14)
-- [ ] Trancher H1 (stack), H2 (LLM), H3 (utilisateurs)
-- [ ] Compléter la section « Commandes » de CLAUDE.md
-- [ ] Trancher H4 (seuil) et H5 (sécurité)
+- [x] Trancher H1 (stack), H2 (LLM), H3 (utilisateurs) : D15 à D17
+- [x] Compléter la section « Commandes » de CLAUDE.md
 
-### Critères d'acceptation de la phase 0
-- D11 à D14 sont consignées et reflétées dans les fichiers 01, 02 et 03.
-- H1 à H3 sont tranchées (nécessaire pour démarrer la phase 1).
-- Le dossier possède son propre dépôt Git.
+## Phase 1 : tâches
+Objectif : importer un cours, extraire son texte en conservant les numéros de page, et détecter les fichiers vides, scannés ou mal extraits (02 §1, étapes 1 à 3). Aucun appel au LLM dans cette phase.
+
+### T1.1 — Mise en place de l'environnement
+Fichiers : `requirements.txt`, `requirements-dev.txt`, `.env.example`, `app.py` (page minimale), `studyhub/__init__.py`.
+- [ ] Les commandes de la section « Commandes » de CLAUDE.md fonctionnent toutes.
+- [ ] `streamlit run` affiche une page titrée « StudyHub AI ».
+- [ ] `pytest` s'exécute sans erreur.
+- [ ] `.env.example` contient `ANTHROPIC_API_KEY=` sans valeur ; `.env` n'est pas suivi par Git.
+
+### T1.2 — Extraction du texte avec numéros de page
+Fichier : `studyhub/extraction.py`.
+- [ ] Un PDF de 3 pages donne 3 passages numérotés 1, 2, 3, chacun avec le texte de sa page.
+- [ ] Un fichier `.txt` ou `.md` donne un passage unique numéroté 1.
+- [ ] Un format non pris en charge produit une erreur explicite, sans plantage.
+- [ ] Tests automatiques pour chaque cas ci-dessus.
+
+### T1.3 — Contrôle de l'extraction
+Fichier : `studyhub/controle.py`. Règles : 02 §4.
+- [ ] Fichier vide ou PDF sans aucun texte → statut « illisible » et message qui explique le problème et demande un autre fichier.
+- [ ] PDF dont certaines pages sont sans texte → statut « incomplet », avertissement et liste des pages concernées.
+- [ ] Fichier trop volumineux ou PDF corrompu → refus avec message clair, sans plantage.
+- [ ] Tests automatiques pour chaque cas ci-dessus.
+
+### T1.4 — Interface d'import
+Fichier : `app.py`.
+- [ ] La zone de téléversement n'accepte que les formats retenus (D18).
+- [ ] Après import : nom du fichier, nombre de pages, statut du contrôle.
+- [ ] Aperçu du texte page par page, identique au texte extrait (D01).
+- [ ] Messages d'erreur et d'avertissement en français (D10).
+- [ ] Vérification manuelle : l'application est lancée avec un fichier de chaque cas de T1.3.
+
+### Critères d'acceptation de la phase 1
+- T1.1 à T1.4 terminées selon la définition de « terminé » de CLAUDE.md.
+- `pytest` passe, sans aucun cours réel dans les tests.
+
+### Hors périmètre de la phase 1
+Appel au LLM, résumé, exercices, PPTX et DOCX (D18), OCR (H6), stockage permanent des cours.
 
 ## Prochaine action
-Trancher H1, H2 et H3.
+T1.1 — Mise en place de l'environnement.
 
 ## Problèmes connus
 Aucun.
