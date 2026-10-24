@@ -1,9 +1,13 @@
-"""Tests de l'interface Streamlit (T1.1, T1.4)."""
+"""Tests de l'interface Streamlit (T1.1, T1.4, T2.1 à T2.3)."""
 
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
 from streamlit.testing.v1 import AppTest
+
+from studyhub.llm import ErreurClaude
+from studyhub.resume import Resume, Segment
 
 APP_PATH = Path(__file__).parent.parent / "app.py"
 TEXTE_SUFFISANT = "Une page de cours avec assez de texte."
@@ -65,6 +69,63 @@ def test_le_formulaire_garde_les_valeurs_saisies(creer_pdf):
     app.text_input(key="matiere").input("Algèbre linéaire").run()
 
     assert app.text_input(key="matiere").value == "Algèbre linéaire"
+
+
+@pytest.fixture
+def cle_configuree(monkeypatch, tmp_path):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-cle-de-test-secrete")
+    monkeypatch.setattr("studyhub.llm.CHEMIN_ENV", tmp_path / ".env")
+
+
+def bouton_resume(app: AppTest):
+    return next(bouton for bouton in app.button if bouton.label == "Générer le résumé")
+
+
+def test_sans_cle_le_bouton_de_resume_est_desactive(monkeypatch, tmp_path, creer_pdf):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.setattr("studyhub.llm.CHEMIN_ENV", tmp_path / ".env")
+
+    app = importer(lancer_app(), "cours.pdf", creer_pdf([TEXTE_SUFFISANT]))
+
+    assert bouton_resume(app).disabled
+
+
+def test_le_resume_genere_s_affiche_avec_ses_pages_et_avertissements(cle_configuree, creer_pdf):
+    resume = Resume(
+        segments=[Segment("Un vecteur a une norme.", (1,))],
+        avertissements=["Le résumé cite la page 2, dont le texte n'a pas été extrait."],
+    )
+    app = importer(lancer_app(), "cours.pdf", creer_pdf([TEXTE_SUFFISANT]))
+
+    with patch("studyhub.resume.generer_resume", return_value=resume) as generer:
+        bouton_resume(app).click().run()
+
+    assert not app.exception
+    generer.assert_called_once()
+    assert any("Un vecteur a une norme. *(p. 1)*" in texte for texte in textes(app.markdown))
+    assert any("page 2" in texte for texte in textes(app.warning))
+
+
+def test_le_resume_reste_affiche_apres_une_autre_action(cle_configuree, creer_pdf):
+    resume = Resume(segments=[Segment("Un vecteur a une norme.", (1,))], avertissements=[])
+    app = importer(lancer_app(), "cours.pdf", creer_pdf([TEXTE_SUFFISANT]))
+    with patch("studyhub.resume.generer_resume", return_value=resume):
+        bouton_resume(app).click().run()
+
+    app.text_input(key="matiere").input("Algèbre").run()
+
+    assert any("Un vecteur a une norme." in texte for texte in textes(app.markdown))
+
+
+def test_une_erreur_de_generation_s_affiche_en_francais(cle_configuree, creer_pdf):
+    app = importer(lancer_app(), "cours.pdf", creer_pdf([TEXTE_SUFFISANT]))
+
+    erreur = ErreurClaude("Trop de demandes en peu de temps.")
+    with patch("studyhub.resume.generer_resume", side_effect=erreur):
+        bouton_resume(app).click().run()
+
+    assert not app.exception
+    assert "Trop de demandes" in app.error[0].value
 
 
 def test_un_cours_illisible_n_affiche_pas_le_formulaire(creer_pdf):
