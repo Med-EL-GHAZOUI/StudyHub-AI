@@ -38,6 +38,9 @@ Avant d'afficher une réponse, vérifier :
 - Question hors cours : si `sources_autorisees` se limite au cours (par défaut), le signaler et demander si l'utilisateur autorise les sources externes ; si elles sont autorisées, répondre en étiquetant le « complément externe ».
 - Référence introuvable : ne pas créer de fausse citation ; dire qu'elle n'a pas été vérifiée.
 - Corrigé incertain : expliciter l'incertitude et proposer une vérification.
+- Service du LLM indisponible (surcharge, limite de requêtes, réseau, délai dépassé) : expliquer simplement et proposer de réessayer ; ne jamais afficher l'erreur technique.
+- Clé d'accès absente, invalide ou crédit épuisé : indiquer comment corriger la configuration.
+- Refus du modèle ou réponse coupée : le signaler, sans présenter une réponse partielle comme complète.
 
 ## 5. Architecture possible d'une application
 - **Interface** : choix de matière, import de cours, chat et exercices.
@@ -62,6 +65,14 @@ Avant d'afficher une réponse, vérifier :
 - Quiz interactifs et suivi des erreurs.
 - Évaluation automatique de la qualité.
 - Historique de révision.
+
+## 7. Sécurité
+- **Clé d'accès** : la clé du fournisseur de LLM est stockée hors du code, dans un fichier de configuration non versionné. Elle n'est jamais affichée, journalisée ni transmise ailleurs qu'au fournisseur.
+- **Injection de prompt** : le contenu des documents importés est une donnée à étudier, jamais une source d'instructions. Il est transmis séparément des consignes, et le modèle doit ignorer les instructions qu'il y trouve et les signaler.
+- **Fichiers importés** : vérifier le format et la taille avant toute lecture ; un fichier invalide est refusé avec un message clair.
+- **Coût** : mesurer la taille de chaque demande avant l'envoi et refuser au-delà d'un plafond.
+- **Erreurs** : l'utilisateur reçoit un message compréhensible ; le détail technique reste dans le journal du serveur.
+- **Données de l'étudiant** : les cours importés sont envoyés au fournisseur du LLM pour être analysés ; l'application ne les conserve pas de façon permanente et ne les utilise jamais comme données de test.
 
 ## Principe
 Context Engineering améliore les informations et consignes données au modèle. Harness Engineering organise le système complet et ses contrôles. Ils sont complémentaires, mais il n'est pas nécessaire de construire un harness complexe pour commencer à étudier.

@@ -75,12 +75,13 @@ Point d'entrée pour la suite : `creer_client()` et `envoyer(client, **parametre
 - [x] Le vrai SDK construit la requête attendue (modèle, `fallbacks: "default"`, en-tête bêta), vérifié avec un faux serveur local, sans Internet.
 - [x] La clé n'apparaît jamais dans un message.
 
-### T2.2 — Préparation du contexte
-Fichier : `studyhub/contexte.py`.
-- [ ] Le cours devient un document avec un bloc par page : le bloc *n* correspond à la page *n*, et les pages sans texte gardent leur place (D28).
-- [ ] Les consignes système reprennent 03, D11 et la règle anti-injection (D26).
-- [ ] Formulaire matière / niveau / chapitre (01 §3).
-- [ ] Au-delà de 100 000 tokens, la demande est refusée avec un message (D31).
+### T2.2 — Préparation du contexte ✅ (2026-10-24)
+Fichiers : `studyhub/contexte.py`, `tests/test_contexte.py`, `studyhub/llm.py` (`compter_tokens`), `app.py` (formulaire), tests ajoutés dans `tests/test_llm.py` et `tests/test_app.py`.
+- [x] Le cours devient un document avec un bloc par page : le bloc *n* correspond à la page *n*, et les pages sans texte gardent leur place (D28). Chaque bloc commence par « [Page n] », pour que Claude connaisse les numéros même sans citations (réponses structurées de T2.4).
+- [x] Les consignes système reprennent 03, 01 §4, D01, D03, D10, D11 et la règle anti-injection (D26). Elles ne contiennent rien de variable, pour que le cache du cours reste valable.
+- [x] Formulaire matière / niveau / chapitre (01 §3), affiché pour un cours lisible ; les valeurs sont conservées d'une action à l'autre. Vérifié par les tests d'interface, pas encore dans le navigateur.
+- [x] Au-delà de 100 000 tokens, `verifier_taille` refuse la demande avec un message (D31). Le comptage (`compter_tokens`, gratuit) est prêt ; il sera appelé avant chaque génération à partir de T2.3.
+- [x] Le vrai SDK envoie bien le document page par page (test avec un faux serveur local).
 
 ### T2.3 — Résumé et notions clés (mode `resume`)
 - [ ] Résumé structuré, notions à mémoriser, prérequis, erreurs fréquentes (03 étape 2), chaque point cité avec sa page.
@@ -110,9 +111,8 @@ Fichier : `studyhub/contexte.py`.
 Références externes (D11), quiz et flashcards (D12), historique et suivi des erreurs (phase 4), évaluation chiffrée de la qualité (phase 3).
 
 ## Prochaine action
-T2.2 — Préparation du contexte.
+T2.3 — Résumé et notions clés.
 Pour T2.7 seulement : l'utilisateur crée lui-même `.env` avec sa clé d'API Anthropic. La clé ne doit jamais être partagée dans la conversation.
-À proposer : le texte de la section « Sécurité » de 02, qui reportera D26.
 
 ## Problèmes connus
 - Les messages et libellés intégrés de Streamlit sont en anglais : refus d'un format non autorisé ou d'un fichier de plus de 20 Mo, boutons « Upload », « Deploy ». C'est accepté pour le MVP (D25). Le libellé de la zone d'import annonce les formats et la limite en français.

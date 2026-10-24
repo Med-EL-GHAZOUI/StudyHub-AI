@@ -10,7 +10,7 @@ import httpx2
 import pytest
 
 from studyhub import llm
-from studyhub.llm import ErreurClaude, cle_configuree, creer_client, envoyer
+from studyhub.llm import ErreurClaude, cle_configuree, compter_tokens, creer_client, envoyer
 
 CLE_DE_TEST = "sk-ant-cle-de-test-secrete"
 REQUETE = httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
@@ -176,3 +176,49 @@ def test_la_cle_n_apparait_dans_aucun_message(avec_cle, monkeypatch):
     messages.append(str(resultat.value))
 
     assert all(CLE_DE_TEST not in message for message in messages)
+
+
+def test_compter_tokens_renvoie_le_nombre_de_tokens_du_modele():
+    client = MagicMock()
+    client.beta.messages.count_tokens.return_value = SimpleNamespace(input_tokens=1234)
+
+    nb_tokens = compter_tokens(client, system="Consignes", messages=[])
+
+    assert nb_tokens == 1234
+    parametres = client.beta.messages.count_tokens.call_args.kwargs
+    assert parametres["model"] == "claude-opus-5-5"
+    assert "fallbacks" not in parametres  # non accepté par le comptage
+
+
+def test_compter_tokens_traduit_les_erreurs_en_francais():
+    client = MagicMock()
+    client.beta.messages.count_tokens.side_effect = anthropic.APIConnectionError(request=REQUETE)
+
+    with pytest.raises(ErreurClaude, match="connexion Internet"):
+        compter_tokens(client, system="Consignes", messages=[])
+
+
+def test_le_vrai_sdk_envoie_le_document_page_par_page_au_comptage(avec_cle):
+    from studyhub.contexte import SYSTEME, ProfilEtudiant, construire_document, construire_messages
+    from studyhub.controle import ResultatControle, Statut
+    from studyhub.extraction import Passage
+
+    requetes = []
+
+    def faux_serveur(requete):
+        requetes.append(requete)
+        return httpx2.Response(200, json={"input_tokens": 42})
+
+    client = anthropic.Anthropic(
+        max_retries=0,
+        http_client=anthropic.DefaultHttpxClient(transport=httpx2.MockTransport(faux_serveur)),
+    )
+    resultat = ResultatControle(Statut.VALIDE, "", [Passage(1, "Page un."), Passage(2, "Page deux.")])
+    messages = construire_messages(construire_document("cours.pdf", resultat), ProfilEtudiant(), "Résume.")
+
+    assert compter_tokens(client, system=SYSTEME, messages=messages) == 42
+    document_envoye = json.loads(requetes[0].content)["messages"][0]["content"][0]
+    assert [bloc["text"] for bloc in document_envoye["source"]["content"]] == [
+        "[Page 1]\nPage un.",
+        "[Page 2]\nPage deux.",
+    ]

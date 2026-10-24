@@ -48,6 +48,31 @@ def test_un_pdf_valide_affiche_nom_pages_statut_et_apercu(creer_pdf):
     assert "Chapitre 1 : les vecteurs du plan" in app.expander[0].text[0].value
 
 
+def test_un_cours_lisible_affiche_le_formulaire_de_contexte(creer_pdf):
+    # 01 §3 : matière, niveau et chapitre étudiés.
+    app = importer(lancer_app(), "cours.pdf", creer_pdf([TEXTE_SUFFISANT]))
+
+    assert [champ.label for champ in app.text_input] == [
+        "Matière",
+        "Niveau d'étude",
+        "Chapitre étudié (facultatif)",
+    ]
+
+
+def test_le_formulaire_garde_les_valeurs_saisies(creer_pdf):
+    app = importer(lancer_app(), "cours.pdf", creer_pdf([TEXTE_SUFFISANT]))
+
+    app.text_input(key="matiere").input("Algèbre linéaire").run()
+
+    assert app.text_input(key="matiere").value == "Algèbre linéaire"
+
+
+def test_un_cours_illisible_n_affiche_pas_le_formulaire(creer_pdf):
+    app = importer(lancer_app(), "scan.pdf", creer_pdf(["", ""]))
+
+    assert len(app.text_input) == 0
+
+
 def test_l_apercu_affiche_le_texte_brut_sans_mise_en_forme():
     # D01 : un texte qui ressemble à du Markdown doit rester identique.
     contenu = "# Titre\n**gras** et _italique_, assez long."

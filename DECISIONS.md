@@ -58,6 +58,7 @@ Dans ce cas, ajouter une nouvelle entrée qui remplace l'ancienne, sans effacer 
 | D31 | Plafond de 100 000 tokens envoyés par demande ; au-delà, refus avec un message proposant d'importer un seul chapitre. | H19 |
 | D32 | Tests automatiques avec un Claude simulé (gratuits, sans Internet) ; un seul essai réel en fin de phase (T2.7), sur accord préalable de l'utilisateur, coût annoncé avant. | H20 |
 | D33 | La correction des réponses de l'étudiant (03 étape 5, mode `corrige`) fait partie de la phase 2. | H21 |
+| D34 | D26 est reportée dans 02 : erreurs techniques ajoutées en §4, nouvelle section §7 « Sécurité ». Nouvelle règle incluse : les cours importés sont envoyés au fournisseur du LLM, ne sont pas conservés de façon permanente et ne servent jamais de données de test. À réexaminer avant la phase 4, qui prévoit un historique (02 §6) et un stockage (02 §5). (Validée le 2026-10-24.) | Proposition de T2.2 |
 
 ## ❓ Hypothèses à confirmer
 | ID | Question | Recommandation actuelle |

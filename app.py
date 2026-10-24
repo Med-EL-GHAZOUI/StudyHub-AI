@@ -24,6 +24,8 @@ def afficher_resultat(nom_fichier: str, resultat: ResultatControle) -> None:
         st.error(resultat.message)
         return
 
+    afficher_formulaire_profil()
+
     st.markdown("**Aperçu du texte extrait**")
     for passage in resultat.passages:
         if passage.numero in resultat.pages_sans_texte:
@@ -36,6 +38,14 @@ def afficher_resultat(nom_fichier: str, resultat: ResultatControle) -> None:
 
 
 # Barre latérale ouverte au démarrage, pour que l'état de la clé d'API reste visible.
+def afficher_formulaire_profil() -> None:
+    # 01 §3. Les clés conservent les valeurs saisies d'une action à l'autre.
+    st.markdown("**Votre contexte d'étude**")
+    st.text_input("Matière", key="matiere", placeholder="Ex. : Algèbre linéaire")
+    st.text_input("Niveau d'étude", key="niveau", placeholder="Ex. : Licence 1")
+    st.text_input("Chapitre étudié (facultatif)", key="chapitre", placeholder="Vide : tout le document")
+
+
 st.set_page_config(page_title="StudyHub AI", initial_sidebar_state="expanded")
 
 st.title("StudyHub AI")

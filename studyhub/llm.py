@@ -67,6 +67,16 @@ def envoyer(client: anthropic.Anthropic, **parametres) -> BetaMessage:
     return reponse
 
 
+def compter_tokens(client: anthropic.Anthropic, **parametres) -> int:
+    """Compte les tokens d'une demande avant de l'envoyer (D26, D31). Le comptage est gratuit."""
+    try:
+        resultat = client.beta.messages.count_tokens(model=MODELE, **parametres)
+    except anthropic.APIError as erreur:
+        journal.warning("Échec du comptage des tokens : %r", erreur)
+        raise ErreurClaude(_message_pour(erreur)) from erreur
+    return resultat.input_tokens
+
+
 def _message_pour(erreur: anthropic.APIError) -> str:
     # Du plus précis au plus général : les sous-classes avant APIStatusError.
     if isinstance(erreur, anthropic.AuthenticationError):
