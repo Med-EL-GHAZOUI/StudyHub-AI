@@ -39,14 +39,13 @@ Fichiers : `studyhub/extraction.py`, `tests/test_extraction.py`, `tests/conftest
 - [x] Un format non pris en charge produit une erreur explicite (`FormatNonPrisEnCharge`) qui liste les formats acceptés.
 - [x] Tests automatiques pour chaque cas ci-dessus (10 tests, plus le test de T1.1).
 
-Remarque pour T1.3 : un PDF corrompu ou un texte indécodable lève encore une erreur brute. Leur transformation en message clair est prévue dans T1.3.
-
-### T1.3 — Contrôle de l'extraction
-Fichier : `studyhub/controle.py`. Règles : 02 §4.
-- [ ] Fichier vide ou PDF sans aucun texte → statut « illisible » et message qui explique le problème et demande un autre fichier.
-- [ ] PDF dont certaines pages sont sans texte → statut « incomplet », avertissement et liste des pages concernées.
-- [ ] Fichier trop volumineux ou PDF corrompu → refus avec message clair, sans plantage.
-- [ ] Tests automatiques pour chaque cas ci-dessus.
+### T1.3 — Contrôle de l'extraction ✅ (2026-10-24)
+Fichiers : `studyhub/controle.py`, `tests/test_controle.py`. Règles : 02 §4.
+Point d'entrée pour l'interface : `controler_fichier(nom, contenu)`, qui renvoie un statut (valide, incomplet, illisible, refusé), un message en français, les passages et les pages sans texte.
+- [x] Fichier vide ou PDF sans aucun texte → statut « illisible » et message qui explique le problème et demande un autre fichier.
+- [x] PDF dont certaines pages sont sans texte → statut « incomplet », avertissement et liste des pages concernées ; le texte des autres pages reste disponible.
+- [x] Fichier trop volumineux (> 20 Mo, D21) ou format non pris en charge → statut « refusé » ; PDF corrompu ou tronqué, texte d'encodage inconnu → statut « illisible ». Message clair dans tous les cas, sans plantage.
+- [x] Tests automatiques pour chaque cas ci-dessus (13 tests, dont le seuil de 20 caractères de D22).
 
 ### T1.4 — Interface d'import
 Fichier : `app.py`.
@@ -64,7 +63,8 @@ Fichier : `app.py`.
 Appel au LLM, résumé, exercices, PPTX et DOCX (D18), OCR (H6), stockage permanent des cours.
 
 ## Prochaine action
-T1.3 — Contrôle de l'extraction.
+T1.4 — Interface d'import.
 
 ## Problèmes connus
+- Les PDF corrompus testés lèvent tous une erreur `pypdf` (`PyPdfError`), qui est interceptée. Un PDF mal formé d'une autre manière pourrait lever une erreur différente, non interceptée. Proposition pour T1.4, à valider : un filet de sécurité dans l'interface qui affiche un message générique au lieu d'une erreur technique.
 - Réseau parfois lent vers PyPI : la première installation a échoué par expiration du délai. D'où l'option `--timeout 120` dans la commande d'installation de CLAUDE.md.
