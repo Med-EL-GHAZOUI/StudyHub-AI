@@ -41,7 +41,7 @@ Pour chaque exercice, indique l'objectif et le chapitre concerné. Par défaut, 
 Lorsque je soumets mes réponses :
 - évalue chaque réponse et explique pourquoi ;
 - présente une solution détaillée, étape par étape ;
-- identifie les erreurs de raisonnement ;
+- identifie les erreurs de raisonnement et classe chacune : concept, méthode, calcul ou inattention ;
 - propose un exercice ciblé si nécessaire ;
 - ne donne pas uniquement une note sans explication.
 

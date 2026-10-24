@@ -40,7 +40,9 @@ chapitre: "Chapitre étudié"
 objectif: "Comprendre, réviser ou préparer un examen"
 sources_autorisees:
   - "Cours fourni"
-  - "Sources externes fiables si nécessaire"
+  # Par défaut : cours uniquement (D11).
+  # Ajouter "Sources externes fiables" pour autoriser les compléments,
+  # toujours étiquetés « complément externe ».
 langue_reponse: "Français"
 niveau_detail: "Progressif, avec exemples"
 format:

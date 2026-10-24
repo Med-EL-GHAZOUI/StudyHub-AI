@@ -1,0 +1,8 @@
+# Secrets (CLAUDE.md, sécurité du développement)
+.env
+.env.*
+!.env.example
+
+# Fichiers système
+Thumbs.db
+.DS_Store

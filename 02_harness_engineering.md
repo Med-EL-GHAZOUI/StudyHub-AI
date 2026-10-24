@@ -21,6 +21,8 @@ Définir le système autour du modèle : étapes de traitement, outils, validati
 - `quiz` : quiz interactif.
 - `revision` : plan de révision selon les erreurs observées.
 
+MVP : les fiches de révision (04, séance 2) utilisent le mode `resume` et l'examen blanc (04, séance 4) le mode `exercices` niveau avancé. Flashcards et quiz : version suivante.
+
 ## 3. Contrôles automatiques
 Avant d'afficher une réponse, vérifier :
 - La réponse correspond-elle à la matière et au chapitre ?
@@ -33,7 +35,7 @@ Avant d'afficher une réponse, vérifier :
 ## 4. Gestion des erreurs
 - Fichier illisible : expliquer le problème et demander un autre fichier.
 - Texte extrait incomplet : avertir l'utilisateur et éviter les conclusions fortes.
-- Question hors cours : demander si l'utilisateur autorise les sources externes, ou répondre en distinguant le complément.
+- Question hors cours : si `sources_autorisees` se limite au cours (par défaut), le signaler et demander si l'utilisateur autorise les sources externes ; si elles sont autorisées, répondre en étiquetant le « complément externe ».
 - Référence introuvable : ne pas créer de fausse citation ; dire qu'elle n'a pas été vérifiée.
 - Corrigé incertain : expliciter l'incertitude et proposer une vérification.
 
