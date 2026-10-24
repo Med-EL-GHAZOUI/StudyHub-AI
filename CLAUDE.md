@@ -35,7 +35,7 @@ Sinon, dire précisément ce qui manque ou échoue. Ne jamais annoncer un succè
 Stack : Python 3.11 + Streamlit (D15). Commandes PowerShell, depuis la racine du projet.
 L'environnement virtuel est appelé directement (`.venv\Scripts\python`), sans activation, pour éviter les blocages de la politique d'exécution de PowerShell.
 - Créer l'environnement (une seule fois) : `python -m venv .venv`
-- Installer : `.venv\Scripts\python -m pip install -r requirements.txt -r requirements-dev.txt`
+- Installer : `.venv\Scripts\python -m pip install --timeout 120 -r requirements.txt -r requirements-dev.txt`
 - Lancer : `.venv\Scripts\python -m streamlit run app.py`
 - Tester : `.venv\Scripts\python -m pytest`
 

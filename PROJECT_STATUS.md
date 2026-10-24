@@ -25,12 +25,12 @@ Dernière mise à jour : 2026-10-24
 ## Phase 1 : tâches
 Objectif : importer un cours, extraire son texte en conservant les numéros de page, et détecter les fichiers vides, scannés ou mal extraits (02 §1, étapes 1 à 3). Aucun appel au LLM dans cette phase.
 
-### T1.1 — Mise en place de l'environnement
-Fichiers : `requirements.txt`, `requirements-dev.txt`, `.env.example`, `app.py` (page minimale), `studyhub/__init__.py`.
-- [ ] Les commandes de la section « Commandes » de CLAUDE.md fonctionnent toutes.
-- [ ] `streamlit run` affiche une page titrée « StudyHub AI ».
-- [ ] `pytest` s'exécute sans erreur.
-- [ ] `.env.example` contient `ANTHROPIC_API_KEY=` sans valeur ; `.env` n'est pas suivi par Git.
+### T1.1 — Mise en place de l'environnement ✅ (2026-10-24)
+Fichiers : `requirements.txt`, `requirements-dev.txt` (versions figées), `.env.example`, `app.py` (page minimale), `studyhub/__init__.py`, `pytest.ini`, `tests/test_app.py`, `.claude/launch.json` (lancement depuis Claude Code).
+- [x] Les commandes de la section « Commandes » de CLAUDE.md fonctionnent toutes.
+- [x] `streamlit run` affiche une page titrée « StudyHub AI » (vérifié dans le navigateur et par `tests/test_app.py`).
+- [x] `pytest` s'exécute sans erreur (1 test réussi).
+- [x] `.env.example` contient `ANTHROPIC_API_KEY=` sans valeur ; `.env` n'est pas suivi par Git (`git check-ignore`).
 
 ### T1.2 — Extraction du texte avec numéros de page
 Fichier : `studyhub/extraction.py`.
@@ -62,7 +62,7 @@ Fichier : `app.py`.
 Appel au LLM, résumé, exercices, PPTX et DOCX (D18), OCR (H6), stockage permanent des cours.
 
 ## Prochaine action
-T1.1 — Mise en place de l'environnement.
+T1.2 — Extraction du texte avec numéros de page.
 
 ## Problèmes connus
-Aucun.
+- Réseau parfois lent vers PyPI : la première installation a échoué par expiration du délai. D'où l'option `--timeout 120` dans la commande d'installation de CLAUDE.md.
