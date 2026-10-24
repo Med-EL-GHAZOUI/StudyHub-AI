@@ -32,12 +32,14 @@ Fichiers : `requirements.txt`, `requirements-dev.txt` (versions figées), `.env.
 - [x] `pytest` s'exécute sans erreur (1 test réussi).
 - [x] `.env.example` contient `ANTHROPIC_API_KEY=` sans valeur ; `.env` n'est pas suivi par Git (`git check-ignore`).
 
-### T1.2 — Extraction du texte avec numéros de page
-Fichier : `studyhub/extraction.py`.
-- [ ] Un PDF de 3 pages donne 3 passages numérotés 1, 2, 3, chacun avec le texte de sa page.
-- [ ] Un fichier `.txt` ou `.md` donne un passage unique numéroté 1.
-- [ ] Un format non pris en charge produit une erreur explicite, sans plantage.
-- [ ] Tests automatiques pour chaque cas ci-dessus.
+### T1.2 — Extraction du texte avec numéros de page ✅ (2026-10-24)
+Fichiers : `studyhub/extraction.py`, `tests/test_extraction.py`, `tests/conftest.py` (génération des PDF de test).
+- [x] Un PDF de 3 pages donne 3 passages numérotés 1, 2, 3, chacun avec le texte de sa page.
+- [x] Un fichier `.txt` ou `.md` donne un passage unique numéroté 1 (UTF-8, ou encodage Windows ancien cp1252).
+- [x] Un format non pris en charge produit une erreur explicite (`FormatNonPrisEnCharge`) qui liste les formats acceptés.
+- [x] Tests automatiques pour chaque cas ci-dessus (10 tests, plus le test de T1.1).
+
+Remarque pour T1.3 : un PDF corrompu ou un texte indécodable lève encore une erreur brute. Leur transformation en message clair est prévue dans T1.3.
 
 ### T1.3 — Contrôle de l'extraction
 Fichier : `studyhub/controle.py`. Règles : 02 §4.
@@ -62,7 +64,7 @@ Fichier : `app.py`.
 Appel au LLM, résumé, exercices, PPTX et DOCX (D18), OCR (H6), stockage permanent des cours.
 
 ## Prochaine action
-T1.2 — Extraction du texte avec numéros de page.
+T1.3 — Contrôle de l'extraction.
 
 ## Problèmes connus
 - Réseau parfois lent vers PyPI : la première installation a échoué par expiration du délai. D'où l'option `--timeout 120` dans la commande d'installation de CLAUDE.md.
