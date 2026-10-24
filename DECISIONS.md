@@ -45,6 +45,7 @@ Dans ce cas, ajouter une nouvelle entrée qui remplace l'ancienne, sans effacer 
 | D22 | Une page avec moins de 20 caractères extraits est considérée comme vide ou scannée. | H13 |
 | D23 | Structure du code : `app.py` (interface) + paquet `studyhub/` (logique) + `tests/`. | H14 |
 | D24 | Filet de sécurité dans l'interface : une erreur inattendue pendant la lecture d'un fichier affiche un message générique en français au lieu d'une erreur technique ; le détail est écrit dans le journal du serveur. | Problème connu de T1.3 |
+| D25 | Exception à D10 acceptée pour le MVP : les messages et libellés intégrés de Streamlit restent en anglais (refus d'un format non autorisé ou d'un fichier de plus de 20 Mo, boutons « Upload », « Deploy »). Les messages produits par l'application restent en français. (Validée le 2026-10-24.) | Problème connu de T1.4 |
 
 ## ❓ Hypothèses à confirmer
 | ID | Question | Recommandation actuelle |

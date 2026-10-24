@@ -2,13 +2,13 @@
 Dernière mise à jour : 2026-10-24
 
 ## Phase actuelle
-**Phase 1 — Import et extraction** (en cours)
+**Phase 1 — Import et extraction** (terminée le 2026-10-24). Prochaine : phase 2, à préparer.
 
 ## Feuille de route
 | Phase | Contenu | Statut |
 |---|---|---|
 | 0 | Fondations : décisions, fichiers de pilotage, dépôt Git, stack | Terminée |
-| 1 | Import et extraction (02 étapes 1 à 3) | En cours |
+| 1 | Import et extraction (02 étapes 1 à 3) | Terminée |
 | 2 | Génération MVP (02 §6) | À faire ; trancher H5 (sécurité) avant |
 | 3 | Harness d'évaluation (05) | À faire ; trancher H4 (seuil) avant ; bloque la phase 4 (D09) |
 | 4 | Version suivante (02 §6) | À faire |
@@ -47,24 +47,30 @@ Point d'entrée pour l'interface : `controler_fichier(nom, contenu)`, qui renvoi
 - [x] Fichier trop volumineux (> 20 Mo, D21) ou format non pris en charge → statut « refusé » ; PDF corrompu ou tronqué, texte d'encodage inconnu → statut « illisible ». Message clair dans tous les cas, sans plantage.
 - [x] Tests automatiques pour chaque cas ci-dessus (13 tests, dont le seuil de 20 caractères de D22).
 
-### T1.4 — Interface d'import
-Fichier : `app.py`.
-- [ ] La zone de téléversement n'accepte que les formats retenus (D18).
-- [ ] Après import : nom du fichier, nombre de pages, statut du contrôle.
-- [ ] Aperçu du texte page par page, identique au texte extrait (D01).
-- [ ] Messages d'erreur et d'avertissement en français (D10).
-- [ ] Vérification manuelle : l'application est lancée avec un fichier de chaque cas de T1.3.
+### T1.4 — Interface d'import ✅ (2026-10-24)
+Fichiers : `app.py`, `.streamlit/config.toml` (limite de 20 Mo, statistiques d'usage désactivées), `tests/test_app.py`.
+- [x] La zone de téléversement n'accepte que les formats retenus (D18). Streamlit refuse lui-même les autres extensions.
+- [x] Après import : nom du fichier, nombre de pages, statut du contrôle.
+- [x] Aperçu du texte page par page, identique au texte extrait (D01) : affichage brut, sans interprétation du Markdown.
+- [x] Messages d'erreur et d'avertissement de l'application en français (D10). Voir la limite dans « Problèmes connus ».
+- [x] Filet de sécurité (D24) : une erreur inattendue affiche un message générique et le détail va dans le journal du serveur.
+- [x] Vérification manuelle dans un navigateur avec un fichier de chaque cas : valide, incomplet, scanné, corrompu, vide, `.md`, `.docx`, plus de 20 Mo.
+- [x] Tests automatiques de l'interface (8 tests au total dans `tests/test_app.py`).
 
-### Critères d'acceptation de la phase 1
-- T1.1 à T1.4 terminées selon la définition de « terminé » de CLAUDE.md.
-- `pytest` passe, sans aucun cours réel dans les tests.
+### Critères d'acceptation de la phase 1 ✅
+- [x] T1.1 à T1.4 terminées selon la définition de « terminé » de CLAUDE.md.
+- [x] `pytest` passe (31 tests), sans aucun cours réel dans les tests.
 
 ### Hors périmètre de la phase 1
 Appel au LLM, résumé, exercices, PPTX et DOCX (D18), OCR (H6), stockage permanent des cours.
 
 ## Prochaine action
-T1.4 — Interface d'import.
+Préparer la phase 2 (génération MVP). Prérequis :
+1. Trancher H5 (sécurité : injection de prompt, clés d'API, erreurs de l'API du LLM).
+2. Choisir le modèle Claude (D16).
+3. Créer `.env` avec une clé d'API Anthropic. L'utilisateur s'en charge lui-même ; la clé ne doit jamais être partagée dans la conversation.
+4. Découper la phase 2 en tâches avec critères d'acceptation.
 
 ## Problèmes connus
-- Les PDF corrompus testés lèvent tous une erreur `pypdf` (`PyPdfError`), qui est interceptée. Un PDF mal formé d'une autre manière pourrait lever une erreur différente, non interceptée. Proposition pour T1.4, à valider : un filet de sécurité dans l'interface qui affiche un message générique au lieu d'une erreur technique.
+- Les messages et libellés intégrés de Streamlit sont en anglais : refus d'un format non autorisé ou d'un fichier de plus de 20 Mo, boutons « Upload », « Deploy ». C'est accepté pour le MVP (D25). Le libellé de la zone d'import annonce les formats et la limite en français.
 - Réseau parfois lent vers PyPI : la première installation a échoué par expiration du délai. D'où l'option `--timeout 120` dans la commande d'installation de CLAUDE.md.

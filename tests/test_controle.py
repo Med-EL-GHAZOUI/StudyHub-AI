@@ -37,7 +37,7 @@ def test_un_pdf_avec_une_page_sans_texte_est_incomplet(creer_pdf):
 
     assert resultat.statut is Statut.INCOMPLET
     assert resultat.pages_sans_texte == [2]
-    assert "page 2" in resultat.message
+    assert "page 2. Cette page est peut-être scannée" in resultat.message
     assert len(resultat.passages) == 3  # le texte lisible reste disponible
 
 
@@ -47,7 +47,7 @@ def test_plusieurs_pages_sans_texte_sont_toutes_listees(creer_pdf):
     )
 
     assert resultat.pages_sans_texte == [2, 4]
-    assert "pages 2, 4" in resultat.message
+    assert "pages 2, 4. Ces pages sont peut-être scannées" in resultat.message
 
 
 def test_une_page_de_moins_de_20_caracteres_compte_comme_sans_texte():

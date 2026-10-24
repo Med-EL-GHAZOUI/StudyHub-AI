@@ -10,6 +10,9 @@ __pycache__/
 *.pyc
 .pytest_cache/
 
+# Fichiers de travail de Playwright (vérifications dans le navigateur)
+.playwright-mcp/
+
 # Fichiers système
 Thumbs.db
 .DS_Store

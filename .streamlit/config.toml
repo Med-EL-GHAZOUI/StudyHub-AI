@@ -1,0 +1,7 @@
+[server]
+# D21 : 20 Mo maximum par fichier importé.
+maxUploadSize = 20
+
+[browser]
+# Ne pas envoyer de statistiques d'utilisation à Streamlit.
+gatherUsageStats = false

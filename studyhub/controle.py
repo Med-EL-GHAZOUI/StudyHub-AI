@@ -73,10 +73,13 @@ def controler_fichier(nom_fichier: str, contenu: bytes) -> ResultatControle:
             pages_sans_texte,
         )
     if pages_sans_texte:
+        if len(pages_sans_texte) == 1:
+            explication = "Cette page est peut-être scannée : les réponses ne pourront pas s'appuyer sur son contenu."
+        else:
+            explication = "Ces pages sont peut-être scannées : les réponses ne pourront pas s'appuyer sur leur contenu."
         return ResultatControle(
             Statut.INCOMPLET,
-            f"Le texte n'a pas pu être extrait pour : {_lister_pages(pages_sans_texte)}. "
-            "Ces pages sont peut-être scannées : les réponses ne pourront pas s'appuyer sur leur contenu.",
+            f"Le texte n'a pas pu être extrait pour : {_lister_pages(pages_sans_texte)}. {explication}",
             passages,
             pages_sans_texte,
         )
