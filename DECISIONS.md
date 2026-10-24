@@ -47,11 +47,22 @@ Dans ce cas, ajouter une nouvelle entrée qui remplace l'ancienne, sans effacer 
 | D24 | Filet de sécurité dans l'interface : une erreur inattendue pendant la lecture d'un fichier affiche un message générique en français au lieu d'une erreur technique ; le détail est écrit dans le journal du serveur. | Problème connu de T1.3 |
 | D25 | Exception à D10 acceptée pour le MVP : les messages et libellés intégrés de Streamlit restent en anglais (refus d'un format non autorisé ou d'un fichier de plus de 20 Mo, boutons « Upload », « Deploy »). Les messages produits par l'application restent en français. (Validée le 2026-10-24.) | Problème connu de T1.4 |
 
+### Choix de la phase 2 (validés le 2026-10-24)
+| ID | Décision | Remplace |
+|---|---|---|
+| D26 | Sécurité : (1) la clé d'API reste dans `.env`, n'est jamais affichée, journalisée ni commitée ; (2) le cours est envoyé dans un bloc « document » séparé des consignes, et les consignes précisent que ce document est une donnée à étudier et que ses éventuelles instructions ne doivent pas être suivies (injection de prompt) ; (3) les tokens sont comptés avant l'envoi, avec un plafond (D31) ; (4) chaque erreur de l'API donne un message en français (clé invalide, limite de requêtes, surcharge, réseau, délai dépassé, refus, réponse coupée). Le texte à reporter dans 02 (section « Sécurité ») sera proposé à part. | H5 |
+| D27 | Modèle : Claude Opus 5.5 (`claude-opus-5-5`), défini par une seule constante dans le code. | H15 |
+| D28 | Envoi du cours : le texte extrait en phase 1, un bloc de contenu par page, citations activées. Une page sans texte reçoit la mention « [page sans texte extrait] » pour garder la numérotation. | H16 |
+| D29 | Chargement de la clé avec `python-dotenv`, depuis `.env`. | H17 |
+| D30 | Repli automatique d'Anthropic activé en cas de refus du modèle (`fallbacks: "default"`). | H18 |
+| D31 | Plafond de 100 000 tokens envoyés par demande ; au-delà, refus avec un message proposant d'importer un seul chapitre. | H19 |
+| D32 | Tests automatiques avec un Claude simulé (gratuits, sans Internet) ; un seul essai réel en fin de phase (T2.7), sur accord préalable de l'utilisateur, coût annoncé avant. | H20 |
+| D33 | La correction des réponses de l'étudiant (03 étape 5, mode `corrige`) fait partie de la phase 2. | H21 |
+
 ## ❓ Hypothèses à confirmer
 | ID | Question | Recommandation actuelle |
 |---|---|---|
 | H4 | Seuil de mise en production | Moyenne ≥ 8/10 et 100 % des tests négatifs réussis |
-| H5 | Section « Sécurité » dans 02 et erreurs techniques dans 02 §4 | Injection de prompt, contrôle des imports, clés d'API, panne et quota du LLM |
 | H6 | PDF scannés | MVP : refuser avec un message clair ; OCR plus tard |
 | H7 | Vérification des URL de références | Contrôle automatique que le lien répond ; la pertinence reste à juger |
 | H8 | Nom « StudyHub AI » dans le README | Ajouter une section consacrée à l'application |

@@ -2,14 +2,14 @@
 Dernière mise à jour : 2026-10-24
 
 ## Phase actuelle
-**Phase 1 — Import et extraction** (terminée le 2026-10-24). Prochaine : phase 2, à préparer.
+**Phase 2 — Génération MVP** (en cours)
 
 ## Feuille de route
 | Phase | Contenu | Statut |
 |---|---|---|
 | 0 | Fondations : décisions, fichiers de pilotage, dépôt Git, stack | Terminée |
 | 1 | Import et extraction (02 étapes 1 à 3) | Terminée |
-| 2 | Génération MVP (02 §6) | À faire ; trancher H5 (sécurité) avant |
+| 2 | Génération MVP (02 §6) | En cours |
 | 3 | Harness d'évaluation (05) | À faire ; trancher H4 (seuil) avant ; bloque la phase 4 (D09) |
 | 4 | Version suivante (02 §6) | À faire |
 
@@ -64,12 +64,53 @@ Fichiers : `app.py`, `.streamlit/config.toml` (limite de 20 Mo, statistiques d'u
 ### Hors périmètre de la phase 1
 Appel au LLM, résumé, exercices, PPTX et DOCX (D18), OCR (H6), stockage permanent des cours.
 
+## Phase 2 : tâches
+Objectif : à partir du cours importé, générer résumé et notions clés avec les pages, des exercices sur 3 niveaux avec solution sur demande, et corriger les réponses de l'étudiant (02 §6, 03, D33). Décisions : D26 à D33.
+
+### T2.1 — Client Claude
+Fichier : `studyhub/llm.py`. Chargement de la clé (D29), modèle (D27), repli automatique (D30), traduction des erreurs en français (D26).
+- [ ] Sans clé, un message clair s'affiche dans l'interface et rien ne plante.
+- [ ] Chaque type d'erreur (clé invalide, accès refusé, limite de requêtes, surcharge, réseau, délai dépassé, refus du modèle, réponse coupée, demande rejetée) donne son message français (tests simulés).
+- [ ] La clé n'apparaît jamais dans un message.
+
+### T2.2 — Préparation du contexte
+Fichier : `studyhub/contexte.py`.
+- [ ] Le cours devient un document avec un bloc par page : le bloc *n* correspond à la page *n*, et les pages sans texte gardent leur place (D28).
+- [ ] Les consignes système reprennent 03, D11 et la règle anti-injection (D26).
+- [ ] Formulaire matière / niveau / chapitre (01 §3).
+- [ ] Au-delà de 100 000 tokens, la demande est refusée avec un message (D31).
+
+### T2.3 — Résumé et notions clés (mode `resume`)
+- [ ] Résumé structuré, notions à mémoriser, prérequis, erreurs fréquentes (03 étape 2), chaque point cité avec sa page.
+- [ ] Une page citée qui n'existe pas ou qui est sans texte déclenche un avertissement ; une absence totale de citation aussi.
+
+### T2.4 — Exercices (mode `exercices`)
+- [ ] Réponse structurée : niveau, objectif, chapitre, énoncé, solution, pages.
+- [ ] Les 3 niveaux sont présents (D06) ; la solution est cachée derrière « Voir la solution » (D05) ; examen blanc = niveau avancé (D12).
+
+### T2.5 — Correction des réponses (mode `corrige`, D33)
+- [ ] Évaluation, explication, solution détaillée et catégorie d'erreur : concept, méthode, calcul ou inattention (D13).
+- [ ] La catégorie fait toujours partie des 4 valeurs ; jamais de note seule sans explication (03 étape 5).
+
+### T2.6 — Interface et mémoire de session
+- [ ] Les résultats restent affichés entre deux actions (import, génération, solution dépliée).
+- [ ] Les limites sont signalées (02 étape 8) ; les tokens consommés sont affichés.
+
+### T2.7 — Vérification réelle (D32)
+- [ ] Coût annoncé et accepté par l'utilisateur avant de lancer.
+- [ ] Essai avec la clé de l'utilisateur sur un cours libre de droits ; chaque page citée est vérifiée à la main dans le PDF ; coût réel noté.
+
+### Critères d'acceptation de la phase 2
+- T2.1 à T2.7 terminées selon la définition de « terminé » de CLAUDE.md.
+- `pytest` passe sans aucun appel réel à l'API.
+
+### Hors périmètre de la phase 2
+Références externes (D11), quiz et flashcards (D12), historique et suivi des erreurs (phase 4), évaluation chiffrée de la qualité (phase 3).
+
 ## Prochaine action
-Préparer la phase 2 (génération MVP). Prérequis :
-1. Trancher H5 (sécurité : injection de prompt, clés d'API, erreurs de l'API du LLM).
-2. Choisir le modèle Claude (D16).
-3. Créer `.env` avec une clé d'API Anthropic. L'utilisateur s'en charge lui-même ; la clé ne doit jamais être partagée dans la conversation.
-4. Découper la phase 2 en tâches avec critères d'acceptation.
+T2.1 — Client Claude.
+Pour T2.7 seulement : l'utilisateur crée lui-même `.env` avec sa clé d'API Anthropic. La clé ne doit jamais être partagée dans la conversation.
+À proposer : le texte de la section « Sécurité » de 02, qui reportera D26.
 
 ## Problèmes connus
 - Les messages et libellés intégrés de Streamlit sont en anglais : refus d'un format non autorisé ou d'un fichier de plus de 20 Mo, boutons « Upload », « Deploy ». C'est accepté pour le MVP (D25). Le libellé de la zone d'import annonce les formats et la limite en français.
