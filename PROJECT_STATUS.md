@@ -67,11 +67,13 @@ Appel au LLM, résumé, exercices, PPTX et DOCX (D18), OCR (H6), stockage perman
 ## Phase 2 : tâches
 Objectif : à partir du cours importé, générer résumé et notions clés avec les pages, des exercices sur 3 niveaux avec solution sur demande, et corriger les réponses de l'étudiant (02 §6, 03, D33). Décisions : D26 à D33.
 
-### T2.1 — Client Claude
-Fichier : `studyhub/llm.py`. Chargement de la clé (D29), modèle (D27), repli automatique (D30), traduction des erreurs en français (D26).
-- [ ] Sans clé, un message clair s'affiche dans l'interface et rien ne plante.
-- [ ] Chaque type d'erreur (clé invalide, accès refusé, limite de requêtes, surcharge, réseau, délai dépassé, refus du modèle, réponse coupée, demande rejetée) donne son message français (tests simulés).
-- [ ] La clé n'apparaît jamais dans un message.
+### T2.1 — Client Claude ✅ (2026-10-24)
+Fichiers : `studyhub/llm.py`, `tests/test_llm.py`, `app.py` (état de la clé dans la barre latérale), `requirements.txt` (`anthropic` 2.3.0, `python-dotenv` 1.2.4). Chargement de la clé (D29), modèle (D27), repli automatique (D30), traduction des erreurs en français (D26).
+Point d'entrée pour la suite : `creer_client()` et `envoyer(client, **parametres)`, qui lève `ErreurClaude` avec un message pour l'étudiant.
+- [x] Sans clé, un message clair s'affiche dans la barre latérale (ouverte au démarrage) et rien ne plante. Vérifié dans le navigateur et par les tests.
+- [x] Chaque type d'erreur donne son message français, y compris le crédit insuffisant (402) : clé invalide, accès refusé, modèle introuvable, limite de requêtes, surcharge ou erreur serveur, demande rejetée, délai dépassé, réseau, refus du modèle, réponse coupée. Testé avec un Claude simulé.
+- [x] Le vrai SDK construit la requête attendue (modèle, `fallbacks: "default"`, en-tête bêta), vérifié avec un faux serveur local, sans Internet.
+- [x] La clé n'apparaît jamais dans un message.
 
 ### T2.2 — Préparation du contexte
 Fichier : `studyhub/contexte.py`.
@@ -108,7 +110,7 @@ Fichier : `studyhub/contexte.py`.
 Références externes (D11), quiz et flashcards (D12), historique et suivi des erreurs (phase 4), évaluation chiffrée de la qualité (phase 3).
 
 ## Prochaine action
-T2.1 — Client Claude.
+T2.2 — Préparation du contexte.
 Pour T2.7 seulement : l'utilisateur crée lui-même `.env` avec sa clé d'API Anthropic. La clé ne doit jamais être partagée dans la conversation.
 À proposer : le texte de la section « Sécurité » de 02, qui reportera D26.
 

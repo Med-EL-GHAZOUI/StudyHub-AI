@@ -82,6 +82,26 @@ def test_un_fichier_vide_affiche_une_erreur():
     assert not app.exception
 
 
+def test_sans_cle_d_api_la_barre_laterale_l_indique(monkeypatch, tmp_path):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.setattr("studyhub.llm.CHEMIN_ENV", tmp_path / ".env")
+
+    app = lancer_app()
+
+    assert not app.exception
+    assert "clé d'API Anthropic est absente" in app.sidebar.warning[0].value
+
+
+def test_avec_cle_d_api_la_barre_laterale_le_confirme(monkeypatch, tmp_path):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-ant-cle-de-test-secrete")
+    monkeypatch.setattr("studyhub.llm.CHEMIN_ENV", tmp_path / ".env")
+
+    app = lancer_app()
+
+    assert "configurée" in app.sidebar.success[0].value
+    assert "sk-ant-cle-de-test-secrete" not in app.sidebar.success[0].value
+
+
 def test_une_erreur_inattendue_affiche_un_message_generique():
     # D24 : filet de sécurité.
     with patch("studyhub.controle.extraire_texte", side_effect=RuntimeError("panne imprévue")):

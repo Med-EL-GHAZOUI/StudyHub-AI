@@ -6,6 +6,7 @@ import streamlit as st
 
 from studyhub.controle import ResultatControle, Statut, controler_fichier
 from studyhub.extraction import FORMATS_ACCEPTES
+from studyhub.llm import MESSAGE_CLE_ABSENTE, cle_configuree
 
 journal = logging.getLogger(__name__)
 
@@ -34,10 +35,17 @@ def afficher_resultat(nom_fichier: str, resultat: ResultatControle) -> None:
             st.text(passage.texte)
 
 
-st.set_page_config(page_title="StudyHub AI")
+# Barre latérale ouverte au démarrage, pour que l'état de la clé d'API reste visible.
+st.set_page_config(page_title="StudyHub AI", initial_sidebar_state="expanded")
 
 st.title("StudyHub AI")
 st.write("Assistant d'étude : analyse de cours, exercices et corrections.")
+
+# Vérification locale uniquement : aucun appel à l'API, et la clé n'est jamais affichée (D26).
+if cle_configuree():
+    st.sidebar.success("Clé d'API Anthropic configurée.")
+else:
+    st.sidebar.warning(MESSAGE_CLE_ABSENTE)
 
 fichier = st.file_uploader(
     "Importer un cours (PDF, .txt ou .md, 20 Mo maximum)",
