@@ -9,6 +9,7 @@ from studyhub.contexte import (
     ProfilEtudiant,
     construire_document,
     construire_messages,
+    verifier_pages,
     verifier_taille,
 )
 from studyhub.controle import ResultatControle
@@ -89,16 +90,7 @@ def _pages_citees(bloc) -> tuple[int, ...]:
 
 
 def _verifier_citations(segments: list[Segment], resultat: ResultatControle) -> list[str]:
-    pages_citees = sorted({page for segment in segments for page in segment.pages})
+    pages_citees = [page for segment in segments for page in segment.pages]
     if not pages_citees:
         return ["Le résumé ne cite aucune page du cours : vérifiez son contenu dans le document original."]
-
-    avertissements = []
-    for page in pages_citees:
-        if page > len(resultat.passages):
-            avertissements.append(f"Le résumé cite la page {page}, qui n'existe pas dans ce cours.")
-        elif page in resultat.pages_sans_texte:
-            avertissements.append(
-                f"Le résumé cite la page {page}, dont le texte n'a pas été extrait : vérifiez ce passage dans le document original."
-            )
-    return avertissements
+    return verifier_pages(pages_citees, resultat, "Le résumé")

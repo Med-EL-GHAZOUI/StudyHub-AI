@@ -84,6 +84,20 @@ def construire_messages(document: dict, profil: ProfilEtudiant, demande: str) ->
     ]
 
 
+def verifier_pages(pages: list[int], resultat: ResultatControle, sujet: str) -> list[str]:
+    """Avertit pour chaque page citée qui n'existe pas ou dont le texte n'a pas été extrait (02 étape 7)."""
+    avertissements = []
+    for page in sorted(set(pages)):
+        if page < 1 or page > len(resultat.passages):
+            avertissements.append(f"{sujet} cite la page {page}, qui n'existe pas dans ce cours.")
+        elif page in resultat.pages_sans_texte:
+            avertissements.append(
+                f"{sujet} cite la page {page}, dont le texte n'a pas été extrait : "
+                "vérifiez ce passage dans le document original."
+            )
+    return avertissements
+
+
 def verifier_taille(nb_tokens: int) -> None:
     if nb_tokens > PLAFOND_TOKENS:
         raise CoursTropVolumineux(

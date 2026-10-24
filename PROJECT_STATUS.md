@@ -92,9 +92,13 @@ Fichiers : `studyhub/resume.py`, `tests/test_resume.py`, `app.py` (bouton « Gé
 - [x] Le vrai SDK lit correctement une réponse réaliste (bloc de réflexion, texte, citation), avec un faux serveur local.
 - Choix d'implémentation : effort `medium`, 16 000 tokens de sortie au maximum, réponse non diffusée en continu (indicateur d'attente). À ajuster avec les mesures de la phase 3.
 
-### T2.4 — Exercices (mode `exercices`)
-- [ ] Réponse structurée : niveau, objectif, chapitre, énoncé, solution, pages.
-- [ ] Les 3 niveaux sont présents (D06) ; la solution est cachée derrière « Voir la solution » (D05) ; examen blanc = niveau avancé (D12).
+### T2.4 — Exercices (mode `exercices`) ✅ (2026-10-24, avec simulation)
+Fichiers : `studyhub/exercices.py`, `tests/test_exercices.py`, `studyhub/contexte.py` (`verifier_pages`, commun au résumé et aux exercices), `app.py` (bouton « Générer des exercices », affichage par niveau), tests ajoutés dans `tests/test_app.py`.
+- [x] Réponse structurée (schéma JSON) : niveau, objectif, chapitre, énoncé, solution, pages. Le document est envoyé sans citations, car l'API ne les accepte pas avec ce format ; les pages sont lues dans le JSON, d'après les repères « [Page n] ». Une réponse illisible donne un message en français.
+- [x] Les 3 niveaux sont demandés (deux exercices par niveau, dans la fourchette de 04) et contrôlés : un niveau manquant déclenche un avertissement (D06). Un exercice sans page, ou qui cite une page inexistante ou sans texte, aussi.
+- [x] La solution est dans un volet « Voir la solution », replié par défaut (D05, vérifié dans le navigateur). Le niveau avancé est intitulé « Avancé (type examen) » (D12).
+- [x] Plafond de 100 000 tokens vérifié avant tout envoi (D31) ; le vrai SDK lit une réponse structurée réaliste (faux serveur local).
+- Choix d'implémentation : effort `high` (la justesse des solutions demande plus de réflexion), 16 000 tokens de sortie au maximum. **La justesse réelle des solutions sera vérifiée en T2.7, puis mesurée en phase 3.**
 
 ### T2.5 — Correction des réponses (mode `corrige`, D33)
 - [ ] Évaluation, explication, solution détaillée et catégorie d'erreur : concept, méthode, calcul ou inattention (D13).
@@ -116,7 +120,7 @@ Fichiers : `studyhub/resume.py`, `tests/test_resume.py`, `app.py` (bouton « Gé
 Références externes (D11), quiz et flashcards (D12), historique et suivi des erreurs (phase 4), évaluation chiffrée de la qualité (phase 3).
 
 ## Prochaine action
-T2.4 — Exercices.
+T2.5 — Correction des réponses.
 Pour T2.7 seulement : l'utilisateur crée lui-même `.env` avec sa clé d'API Anthropic. La clé ne doit jamais être partagée dans la conversation.
 
 ## Problèmes connus

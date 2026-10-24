@@ -6,6 +6,7 @@ from unittest.mock import patch
 import pytest
 from streamlit.testing.v1 import AppTest
 
+from studyhub.exercices import Exercice, SerieExercices
 from studyhub.llm import ErreurClaude
 from studyhub.resume import Resume, Segment
 
@@ -77,8 +78,52 @@ def cle_configuree(monkeypatch, tmp_path):
     monkeypatch.setattr("studyhub.llm.CHEMIN_ENV", tmp_path / ".env")
 
 
+def bouton(app: AppTest, libelle: str):
+    return next(bouton for bouton in app.button if bouton.label == libelle)
+
+
 def bouton_resume(app: AppTest):
-    return next(bouton for bouton in app.button if bouton.label == "Générer le résumé")
+    return bouton(app, "Générer le résumé")
+
+
+def serie_de_test() -> SerieExercices:
+    return SerieExercices(
+        exercices=[
+            Exercice("facile", "Définir un vecteur", "Chapitre 1", "Qu'est-ce qu'un vecteur ?", "Un segment orienté.", (1,)),
+            Exercice("avancé", "Combiner les notions", "Chapitre 2", "Calculez AB.", "On multiplie ligne par colonne.", (2, 3)),
+        ],
+        avertissements=["Aucun exercice de niveau « intermédiaire » n'a été produit."],
+    )
+
+
+def test_sans_cle_le_bouton_d_exercices_est_desactive(monkeypatch, tmp_path, creer_pdf):
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.setattr("studyhub.llm.CHEMIN_ENV", tmp_path / ".env")
+
+    app = importer(lancer_app(), "cours.pdf", creer_pdf([TEXTE_SUFFISANT]))
+
+    assert bouton(app, "Générer des exercices").disabled
+
+
+def test_les_exercices_s_affichent_par_niveau_avec_solution_cachee(cle_configuree, creer_pdf):
+    app = importer(lancer_app(), "cours.pdf", creer_pdf([TEXTE_SUFFISANT]))
+
+    with patch("studyhub.exercices.generer_exercices", return_value=serie_de_test()):
+        bouton(app, "Générer des exercices").click().run()
+
+    assert not app.exception
+    contenus = textes(app.markdown)
+    assert "#### Facile" in contenus
+    assert "#### Avancé (type examen)" in contenus  # D12
+    assert any("Exercice 1 — Définir un vecteur" in texte for texte in contenus)
+    assert "Qu'est-ce qu'un vecteur ?" in contenus
+    assert any("intermédiaire" in texte for texte in textes(app.warning))
+    # D05 : chaque solution est dans un volet replié « Voir la solution ».
+    solutions = [volet for volet in app.expander if volet.label == "Voir la solution"]
+    assert [volet.markdown[0].value for volet in solutions] == [
+        "Un segment orienté.",
+        "On multiplie ligne par colonne.",
+    ]
 
 
 def test_sans_cle_le_bouton_de_resume_est_desactive(monkeypatch, tmp_path, creer_pdf):

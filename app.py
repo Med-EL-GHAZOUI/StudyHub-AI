@@ -6,9 +6,12 @@ import streamlit as st
 
 from studyhub.contexte import CoursTropVolumineux, ProfilEtudiant
 from studyhub.controle import ResultatControle, Statut, controler_fichier
+from studyhub.exercices import NIVEAUX, SerieExercices, generer_exercices
 from studyhub.extraction import FORMATS_ACCEPTES
 from studyhub.llm import MESSAGE_CLE_ABSENTE, ErreurClaude, cle_configuree, creer_client
-from studyhub.resume import generer_resume, texte_avec_pages
+from studyhub.resume import Resume, generer_resume, texte_avec_pages
+
+TITRES_NIVEAUX = {"facile": "Facile", "intermédiaire": "Intermédiaire", "avancé": "Avancé (type examen)"}  # D12
 
 journal = logging.getLogger(__name__)
 
@@ -27,7 +30,7 @@ def afficher_resultat(nom_fichier: str, resultat: ResultatControle) -> None:
         return
 
     afficher_formulaire_profil()
-    afficher_resume(nom_fichier, resultat)
+    afficher_generations(nom_fichier, resultat)
 
     st.markdown("**Aperçu du texte extrait**")
     for passage in resultat.passages:
@@ -56,33 +59,83 @@ def profil_saisi() -> ProfilEtudiant:
     )
 
 
-def afficher_resume(nom_fichier: str, resultat: ResultatControle) -> None:
+def afficher_generations(nom_fichier: str, resultat: ResultatControle) -> None:
+    profil = profil_saisi()
+    colonne_resume, colonne_exercices = st.columns(2)
+    with colonne_resume:
+        bouton_de_generation(
+            "Générer le résumé",
+            "Claude prépare le résumé du cours…",
+            "resume",
+            nom_fichier,
+            lambda client: generer_resume(client, nom_fichier, resultat, profil),
+        )
+    with colonne_exercices:
+        bouton_de_generation(
+            "Générer des exercices",
+            "Claude prépare les exercices…",
+            "exercices",
+            nom_fichier,
+            lambda client: generer_exercices(client, nom_fichier, resultat, profil),
+        )
+
+    resume = resultat_memorise("resume", nom_fichier)
+    if resume:
+        afficher_resume(resume)
+    serie = resultat_memorise("exercices", nom_fichier)
+    if serie:
+        afficher_exercices(serie)
+
+
+def bouton_de_generation(libelle: str, attente: str, cle_session: str, nom_fichier: str, generer) -> None:
     cle_presente = cle_configuree()
     if st.button(
-        "Générer le résumé",
+        libelle,
         disabled=not cle_presente,
         help=None if cle_presente else "Configurez d'abord la clé d'API (voir la barre latérale).",
     ):
-        with st.spinner("Claude prépare le résumé du cours…"):
+        with st.spinner(attente):
             try:
-                resume = generer_resume(creer_client(), nom_fichier, resultat, profil_saisi())
+                # Conservé entre deux actions : Streamlit réexécute la page à chaque clic.
+                st.session_state[cle_session] = (nom_fichier, generer(creer_client()))
             except (ErreurClaude, CoursTropVolumineux) as erreur:
                 st.error(str(erreur))
             except Exception:
                 # D24 : filet de sécurité, étendu à la génération.
-                journal.exception("Erreur inattendue pendant la génération du résumé de %s", nom_fichier)
-                st.error("Une erreur inattendue s'est produite pendant la génération du résumé. Réessayez.")
-            else:
-                # Conservé entre deux actions : Streamlit réexécute la page à chaque clic.
-                st.session_state["resume"] = (nom_fichier, resume)
+                journal.exception("Erreur inattendue pendant « %s » pour %s", libelle, nom_fichier)
+                st.error("Une erreur inattendue s'est produite pendant la génération. Réessayez.")
 
-    memorise = st.session_state.get("resume")
+
+def resultat_memorise(cle_session: str, nom_fichier: str):
+    memorise = st.session_state.get(cle_session)
     if memorise and memorise[0] == nom_fichier:
-        resume = memorise[1]
-        st.markdown("**Résumé et notions clés**")
-        for avertissement in resume.avertissements:
-            st.warning(avertissement)
-        st.markdown(texte_avec_pages(resume))
+        return memorise[1]
+    return None
+
+
+def afficher_resume(resume: Resume) -> None:
+    st.markdown("**Résumé et notions clés**")
+    for avertissement in resume.avertissements:
+        st.warning(avertissement)
+    st.markdown(texte_avec_pages(resume))
+
+
+def afficher_exercices(serie: SerieExercices) -> None:
+    st.markdown("**Exercices**")
+    for avertissement in serie.avertissements:
+        st.warning(avertissement)
+    for niveau in NIVEAUX:
+        exercices = [(numero, exercice) for numero, exercice in enumerate(serie.exercices, start=1) if exercice.niveau == niveau]
+        if not exercices:
+            continue
+        st.markdown(f"#### {TITRES_NIVEAUX[niveau]}")
+        for numero, exercice in exercices:
+            pages = ", ".join(str(page) for page in exercice.pages) or "aucune"
+            st.markdown(f"**Exercice {numero} — {exercice.objectif}**  \n*{exercice.chapitre} · p. {pages}*")
+            st.markdown(exercice.enonce)
+            # D05 : la solution reste repliée tant que l'étudiant ne la demande pas.
+            with st.expander("Voir la solution"):
+                st.markdown(exercice.solution)
 
 
 # Barre latérale ouverte au démarrage, pour que l'état de la clé d'API reste visible.
